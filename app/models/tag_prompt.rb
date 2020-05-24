@@ -5,7 +5,7 @@ class TagPrompt < ActiveRecord::Base
 
   def html_control(tag_prompt_deployment, answer, user_id)
     html = ""
-    unless answer.nil?
+    unless answer.nil? and answer.need_to_be_tagged(tag_prompt_deployment)
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id, user_id: user_id)
 
       length_valid = false

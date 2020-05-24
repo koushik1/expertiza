@@ -129,4 +129,12 @@ class Answer < ActiveRecord::Base
     map.reviewee_id
   end
   # end added by ferry for answer tagging
+
+  # return true if the active learning algorithm fails to provide confident input
+  # for the provided tag and asks students to do so manually.
+  def need_to_be_tagged(tag_prompt_deployment)
+    tag_prompt = TagPrompt.find(tag_prompt_deployment.tag_prompt_id)
+    atm = AnswerTagMapping.find(self.id, tag_prompt.id)
+    !atm.nil?
+  end
 end
