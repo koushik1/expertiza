@@ -244,7 +244,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       # structure of taggable_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                          answer_id_2 => [tag_prompt_id_3], ...}
-      taggable_answer_prompts = ReviewMetrics.get_taggable_answer_prompts(answers, tag_prompt_deployments)
+      taggable_answer_prompts = MetricsQuery.new.get_taggable_answer_prompts(answers, tag_prompt_deployments)
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, taggable_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
