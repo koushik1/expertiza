@@ -199,33 +199,13 @@ class Criterion < ScoredQuestion
     html += score
     html += '</div>'
     html += '</td>'
-    html += show_tag_prompts(answer, tag_prompt_deployments, taggable_answer_prompts[answer.id], current_user) if answer && !answer.comments.nil?
+    if answer && !answer.comments.nil?
+      html = '<td style="padding-left:10px">'
+      html += '<br>' + answer.comments.html_safe
+      html += '</td>'
+      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, taggable_answer_prompts[answer.id], answer, current_user)
+    end
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
-  end
-
-  # structure of taggable_prompts = [tag_prompt_id_1, tag_prompt_id_2, ...]
-  def show_tag_prompts(answer, tag_prompt_deployments, taggable_prompts, current_user = nil)
-    html = '<td style="padding-left:10px">'
-    html += '<br>' + answer.comments.html_safe
-    html += '</td>'
-    #### start code to show tag prompts ####
-    unless tag_prompt_deployments.nil?
-      # show check boxes for answer tagging
-      resp = Response.find(answer.response_id)
-      question = Question.find(answer.question_id)
-      if tag_prompt_deployments.count > 0
-        html += '<tr><td colspan="2">'
-        tag_prompt_deployments.each do |tag_dep|
-          if taggable_prompts.includes?(tag_dep.tag_prompt_id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-            tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-            html += tag_prompt.html_control(tag_dep, answer, current_user)
-          end
-        end
-        html += '</td></tr>'
-      end
-    end
-    html
-    #### end code to show tag prompts ####
   end
 end
