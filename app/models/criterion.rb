@@ -200,7 +200,7 @@ class Criterion < ScoredQuestion
     html += '</div>'
     html += '</td>'
     if answer && !answer.comments.nil?
-      html = '<td style="padding-left:10px">'
+      html += '<td style="padding-left:10px">'
       html += '<br>' + answer.comments.html_safe
       html += '</td>'
       html += TagPrompt.show_tag_prompts(tag_prompt_deployments, taggable_answer_prompts[answer.id], answer, current_user)
