@@ -242,7 +242,10 @@ class Response < ActiveRecord::Base
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
-      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
+      # structure of taggable_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
+      #                                          answer_id_2 => [tag_prompt_id_3], ...}
+      taggable_answer_prompts = ReviewMetrics.get_taggable_answer_prompts(answers, tag_prompt_deployments)
+      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, taggable_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -253,7 +256,7 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil
+  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, taggable_answer_prompts = nil, current_user = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
@@ -265,7 +268,7 @@ class Response < ActiveRecord::Base
       if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
+                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, taggable_answer_prompts, current_user) || ''
                 elsif question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max) || ''
                 else
