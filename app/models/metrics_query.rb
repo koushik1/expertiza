@@ -5,6 +5,10 @@ class MetricsQuery
   #             { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
   #               answer_id_2 => [tag_prompt_id_3], ...}
   # to associate each answer with its taggable prompts
+
+  #Setting the Tagging Threshold Constant
+  TAG_CERTAINTY_CONSTANT = 0.8
+
   def get_taggable_answer_prompts(answers, tag_prompt_deployments)
     # step 1. transform answers to a format that can be understood by the WS
     taggable_answer_prompts = Hash.new(|hash, key| hash[key] = [])
@@ -27,7 +31,7 @@ class MetricsQuery
         ws_output = JSON.parse(response)["reviews"]
         # let's assume that we want tags below 80% confidence to be shown to the authors
         ws_output.each do |review|
-          taggable_answer_prompts[review.id].push(tag_dep.tag_prompt_id) if review['confidence'] < 0.8
+          taggable_answer_prompts[review.id].push(tag_dep.tag_prompt_id) if review['confidence'] < TAG_CERTAINTY_CONSTANT
         end
       rescue StandardError => e
         # at any time the StandardError occur, return nil so we don't render half result
