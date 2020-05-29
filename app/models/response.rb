@@ -245,7 +245,7 @@ class Response < ActiveRecord::Base
       # structure of taggable_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                          answer_id_2 => [tag_prompt_id_3], ...}
       taggable_answer_prompts = MetricsQuery.new.get_taggable_answer_prompts(answers, tag_prompt_deployments)
-      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, taggable_answer_prompts, current_user
+      code = add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments, taggable_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -256,7 +256,7 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, taggable_answer_prompts = nil, current_user = nil
+  def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, taggable_answer_prompts = nil, current_user = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
