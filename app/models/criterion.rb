@@ -169,11 +169,11 @@ class Criterion < ScoredQuestion
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
-  # count - Specifies the question number
+  # count - The question number
   # answer - The answer associated with the question
   # questionnaire_max - Maximum score for a question
-  # tag_prompt_deployments - Specify the tag prompts assigned to this questionnaire
-  # tagged_answer_prompts - The answer ids which need to be tagged
+  # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
+  # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   # current_user - The user
   def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"

@@ -34,7 +34,7 @@ class MetricsQuery
           tagged_answer_prompts[review.id].push(tag_dep.tag_prompt_id) if review['confidence'] >= TAG_CERTAINTY_THRESHOLD
         end
       rescue StandardError => e
-        # at any time the StandardError occur, return nil so we don't render half result
+        # at any time the StandardError occur, return nil so we don't render partial result
         return nil
       end
     end
