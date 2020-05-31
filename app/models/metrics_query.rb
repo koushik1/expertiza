@@ -1,17 +1,15 @@
 class MetricsQuery
-
-  #Setting the Tagging Threshold Constant
+  # Setting the Tagging Threshold Constant
   TAG_CERTAINTY_THRESHOLD = 0.8
-
 
   # answer_tagging: this method calls the WS to determine which tags need to be rendered
   # for manual inputs in order to increase the bot's confidence on its next judgment.
   # The result that the web-service sends back is formatted as
   #             { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
   #               answer_id_2 => [tag_prompt_id_3], ...}
-  # to associate each answer with its taggable prompts
-
-  def get_taggable_answer_prompts(answers, tag_prompt_deployments)
+  # to associate each answer with tags that the bot is confident of
+  # (or in other words, tagged by the bot).
+  def get_tagged_answer_prompts(answers, tag_prompt_deployments)
     # step 1. transform answers to a format that can be understood by the WS
     tagged_answer_prompts = Hash.new(|hash, key| hash[key] = [])
     ws_input = {'reviews': []}
@@ -32,9 +30,8 @@ class MetricsQuery
       begin
         response = RestClient.post url, ws_input.to_json, content_type: :json, accept: :json
         ws_output = JSON.parse(response)["reviews"]
-        # let's assume that we want tags below 80% confidence to be shown to the authors
         ws_output.each do |review|
-          tagged_answer_prompts[review.id].push(tag_dep.tag_prompt_id) if review['confidence'] < TAG_CERTAINTY_THRESHOLD
+          tagged_answer_prompts[review.id].push(tag_dep.tag_prompt_id) if review['confidence'] >= TAG_CERTAINTY_THRESHOLD
         end
       rescue StandardError => e
         # at any time the StandardError occur, return nil so we don't render half result

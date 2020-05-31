@@ -247,9 +247,9 @@ class Response < ActiveRecord::Base
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
-      # structure of taggable_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
-      #                                          answer_id_2 => [tag_prompt_id_3], ...}
-      tagged_answer_prompts = MetricsQuery.new.get_taggable_answer_prompts(answers, tag_prompt_deployments)
+      # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
+      #                                        answer_id_2 => [tag_prompt_id_3], ...}
+      tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
       code = add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
@@ -261,13 +261,13 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  #Function which adds a table row for each question-answer pair
-  # questionnaire_max - maximum score for a question
+  # Function which adds a table row for each question-answer pair
+  # questionnaire_max - Maximum score for a question
   # questions - Questions in the questionnaire
   # answers - Answers to the questions
-  # code - html to be returned
+  # code - Html to be returned
   # tag_prompt_deployments - Specify the tag prompts assigned to this questionnaire
-  # tagged_answer_prompts - The answer ids which need to be tagged
+  # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)

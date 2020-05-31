@@ -170,7 +170,7 @@ class Criterion < ScoredQuestion
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
   # count - Specifies the question number
-  # answer - The answer assosiated with the question
+  # answer - The answer associated with the question
   # questionnaire_max - Maximum score for a question
   # tag_prompt_deployments - Specify the tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The answer ids which need to be tagged
