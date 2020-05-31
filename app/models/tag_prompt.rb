@@ -3,8 +3,8 @@ class TagPrompt < ActiveRecord::Base
   validates :desc, presence: true
   validates :control_type, presence: true
 
-  # structure of taggable_prompts = [tag_prompt_id_1, tag_prompt_id_2, ...]
-  def self.show_tag_prompts(tag_prompt_deployments, taggable_prompts, answer, current_user = nil)
+  # structure of tagged_answer_prompts = [tag_prompt_id_1, tag_prompt_id_2, ...]
+  def self.show_tag_prompts(tag_prompt_deployments, tagged_answer_prompts, answer, current_user = nil)
     html = ''
     #### start code to show tag prompts ####
     unless tag_prompt_deployments.nil?
@@ -13,7 +13,7 @@ class TagPrompt < ActiveRecord::Base
       if tag_prompt_deployments.count > 0
         html += '<tr><td colspan="2">'
         tag_prompt_deployments.each do |tag_dep|
-          if taggable_prompts.includes?(tag_dep.tag_prompt_id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
+          if tagged_answer_prompts.excludes?(tag_dep.tag_prompt_id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
             tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
             html += tag_prompt.html_control(tag_dep, answer, current_user)
           end

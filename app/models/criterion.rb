@@ -169,13 +169,13 @@ class Criterion < ScoredQuestion
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
-  # count - Number of questions
+  # count - Specifies the question number
   # answer - The answer assosiated with the question
-  # questionnaire_max - maximum score for a question
-  # tag_prompt_deployments - The ids for each tag prompt
-  # taggable_answer_prompts - The answer ids which need to be tagged
+  # questionnaire_max - Maximum score for a question
+  # tag_prompt_deployments - Specify the tag prompts assigned to this questionnaire
+  # tagged_answer_prompts - The answer ids which need to be tagged
   # current_user - The user
-  def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, taggable_answer_prompts = nil, current_user = nil)
+  def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
 
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
@@ -209,7 +209,7 @@ class Criterion < ScoredQuestion
       html += '<td style="padding-left:10px">'
       html += '<br>' + answer.comments.html_safe
       html += '</td>'
-      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, taggable_answer_prompts[answer.id], answer, current_user)
+      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, tagged_answer_prompts[answer.id], answer, current_user)
     end
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)

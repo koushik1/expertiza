@@ -235,7 +235,7 @@ class Response < ActiveRecord::Base
 
   # Function which creates the html for responses to a questionnaire by a particular user
   # code - The html to be returned
-  # seld_id - review id
+  # seld_id - Review id
   # show_tags - Boolean which tells us if tags are enabled or disabled
   # current_user - User id
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
@@ -249,8 +249,8 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       # structure of taggable_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                          answer_id_2 => [tag_prompt_id_3], ...}
-      taggable_answer_prompts = MetricsQuery.new.get_taggable_answer_prompts(answers, tag_prompt_deployments)
-      code = add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments, taggable_answer_prompts, current_user
+      tagged_answer_prompts = MetricsQuery.new.get_taggable_answer_prompts(answers, tag_prompt_deployments)
+      code = add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -266,9 +266,9 @@ class Response < ActiveRecord::Base
   # questions - Questions in the questionnaire
   # answers - Answers to the questions
   # code - html to be returned
-  # tag_prompt_deployments - The ids for each tag prompt
-  # taggable_answer_prompts - The answer ids which need to be tagged
-  def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, taggable_answer_prompts = nil, current_user = nil
+  # tag_prompt_deployments - Specify the tag prompts assigned to this questionnaire
+  # tagged_answer_prompts - The answer ids which need to be tagged
+  def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
@@ -280,7 +280,7 @@ class Response < ActiveRecord::Base
       if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, taggable_answer_prompts, current_user) || ''
+                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
                 elsif question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max) || ''
                 else
