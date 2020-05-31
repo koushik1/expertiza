@@ -233,6 +233,11 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
+  # Function which creates the html for responses to a questionnaire by a particular user
+  # code - The html to be returned
+  # seld_id - review id
+  # show_tags - Boolean which tells us if tags are enabled or disabled
+  # current_user - User id
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
@@ -256,6 +261,13 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
+  #Function which adds a table row for each question-answer pair
+  # questionnaire_max - maximum score for a question
+  # questions - Questions in the questionnaire
+  # answers - Answers to the questions
+  # code - html to be returned
+  # tag_prompt_deployments - The ids for each tag prompt
+  # taggable_answer_prompts - The answer ids which need to be tagged
   def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, taggable_answer_prompts = nil, current_user = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)

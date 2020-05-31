@@ -19,6 +19,7 @@ class MetricsQuery
 
     # this is rather hard-coded, need to find a way to link each tag_prompt with its
     # corresponding web service call
+    # we create a dict which maps tag prompt ids to their relevant API endpoints
     metrics = { 1 => 'problems', 2 => 'suggestions', 3 => 'emotions', 5 => 'sentiments'}
     tag_prompt_deployments.each do |tag_dep|
       metric = metrics[tag_dep.tag_prompt_id]
