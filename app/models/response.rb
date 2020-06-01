@@ -235,7 +235,7 @@ class Response < ActiveRecord::Base
 
   # Function which creates the html for responses to a questionnaire by a particular user
   # code - The html to be returned
-  # seld_id - Review id
+  # self_id - Review id
   # show_tags - Boolean which tells us if tags are enabled or disabled
   # current_user - User id
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
@@ -266,7 +266,7 @@ class Response < ActiveRecord::Base
   # questions - Questions in the questionnaire
   # answers - Answers to the questions
   # code - Html to be returned
-  # tag_prompt_deployments - Specify the tag prompts assigned to this questionnaire
+  # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
     count = 0
