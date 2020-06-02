@@ -50,7 +50,7 @@ class Dropdown < UnscoredQuestion
     html
   end
 
-  def view_completed_question(count, answer)
+  def view_answered_question(count, answer)
     html = '<b>' + count.to_s + ". " + self.txt + "</b>"
     html += '<BR>&nbsp&nbsp&nbsp&nbsp' + answer.comments.to_s
 

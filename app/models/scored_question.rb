@@ -8,7 +8,7 @@ class ScoredQuestion < ChoiceQuestion
 
   def complete; end
 
-  def view_completed_question; end
+  def view_answered_question; end
 
   def self.compute_question_score(response_id)
     answer = Answer.find_by(question_id: self.id, response_id: response_id)

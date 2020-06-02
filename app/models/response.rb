@@ -282,11 +282,11 @@ class Response < ActiveRecord::Base
       if !answer.nil? or question.is_a? QuestionnaireHeader
         html_code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_completed_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
+                  question.view_answered_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
                 elsif question.instance_of? Scale
-                  question.view_completed_question(seq_no, answer) || ''
+                  question.view_answered_question(seq_no, answer) || ''
                 else
-                  question.view_completed_question(seq_no, answer) || ''
+                  question.view_answered_question(seq_no, answer) || ''
                 end
       end
       html_code += '</td></tr>'

@@ -10,7 +10,7 @@ class TextField < TextResponse
     html.html_safe
   end
 
-  def view_completed_question(count, answer)
+  def view_answered_question(count, answer)
     if self.type == 'TextField' and self.break_before == true
       html = '<b>' + count.to_s + ". " + self.txt + "</b>"
       html += '&nbsp;&nbsp;&nbsp;&nbsp;'

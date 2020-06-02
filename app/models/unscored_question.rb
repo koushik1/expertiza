@@ -5,5 +5,5 @@ class UnscoredQuestion < ChoiceQuestion
 
   def complete; end
 
-  def view_completed_question; end
+  def view_answered_question; end
 end

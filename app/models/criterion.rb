@@ -175,7 +175,7 @@ class Criterion < ScoredQuestion
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   # current_user - The user
-  def view_completed_question(seq_no, answer, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
+  def view_answered_question(seq_no, answer, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
     max_question_score = Response.new.questionnaire_by_answer(answer).max_question_score
     html = '<b>' + seq_no.to_s + ". " + self.txt + ' [Max points: ' + max_question_score.to_s + "]</b>"
 

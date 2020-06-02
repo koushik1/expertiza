@@ -111,7 +111,7 @@ class Checkbox < UnscoredQuestion
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
-  def view_completed_question(count, answer)
+  def view_answered_question(count, answer)
     html = check_previous_question
     html += view_completed_question_answer(count, answer)
     html += view_completed_question_if_column_header

@@ -65,7 +65,7 @@ class Question < ActiveRecord::Base
   end
 
   # this method decide what to display if a student is filling out a questionnaire
-  def view_completed_question
+  def view_answered_question
     nil
   end
 

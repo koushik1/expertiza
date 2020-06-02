@@ -46,7 +46,7 @@ class MultipleChoiceCheckbox < QuizQuestion
     html
   end
 
-  def view_completed_question(user_answer)
+  def view_answered_question(user_answer)
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
     html = ''
     quiz_question_choices.each do |answer|
