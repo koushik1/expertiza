@@ -175,12 +175,13 @@ class Criterion < ScoredQuestion
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   # current_user - The user
-  def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
-    html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
+  def view_completed_question(seq_no, answer, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
+    max_score = Response.new.questionnaire_by_answer(answer).max_question_score
+    html = '<b>' + seq_no.to_s + ". " + self.txt + ' [Max points: ' + max_score.to_s + "]</b>"
 
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = if score != "-"
-                      answer.answer * 1.0 / questionnaire_max
+                      answer.answer * 1.0 / max_score
                     else
                       0
                     end

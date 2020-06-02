@@ -74,9 +74,10 @@ class Scale < ScoredQuestion
     html.html_safe
   end
 
-  def view_completed_question(count, answer, questionnaire_max)
-    html = '<b>' + count.to_s + ". " + self.txt + "</b><BR/><BR/>"
-    html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">' + answer.answer.to_s + '</FONT> out of <B>' + questionnaire_max.to_s + '</B></TD>'
+  def view_completed_question(seq_no, answer)
+    max_score = Response.new.questionnaire_by_answer(answer).max_question_score
+    html = '<b>' + seq_no.to_s + ". " + self.txt + "</b><BR/><BR/>"
+    html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">' + answer.answer.to_s + '</FONT> out of <B>' + max_score.to_s + '</B></TD>'
     html.html_safe
   end
 end

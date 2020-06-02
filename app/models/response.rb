@@ -243,14 +243,14 @@ class Response < ActiveRecord::Base
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
-      questionnaire_max = questionnaire.max_question_score
+      #questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                        answer_id_2 => [tag_prompt_id_3], ...}
       tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
-      code = add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments, tagged_answer_prompts, current_user
+      code = add_rows_for_each_question questions, answers, code, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -268,11 +268,11 @@ class Response < ActiveRecord::Base
   # code - Html to be returned
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
-  def add_rows_for_each_question questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
-    count = 0
+  def add_rows_for_each_question questions, answers, code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
+    seq_no = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
-      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+      seq_no += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find {|a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
@@ -280,11 +280,11 @@ class Response < ActiveRecord::Base
       if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
+                  question.view_completed_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
                 elsif question.instance_of? Scale
-                  question.view_completed_question(count, answer, questionnaire_max) || ''
+                  question.view_completed_question(seq_no, answer) || ''
                 else
-                  question.view_completed_question(count, answer) || ''
+                  question.view_completed_question(seq_no, answer) || ''
                 end
       end
       code += '</td></tr>'
