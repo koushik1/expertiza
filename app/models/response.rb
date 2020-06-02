@@ -24,13 +24,13 @@ class Response < ActiveRecord::Base
     identifier += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
     if prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + self.id.to_s
-      code = construct_instructor_html identifier, self_id, count
+      html_code = construct_instructor_html identifier, self_id, count
     else # in student end
       self_id = self.id.to_s
-      code = construct_student_html identifier, self_id, count
+      html_code = construct_student_html identifier, self_id, count
     end
-    code = construct_review_response code, self_id, show_tags, current_user
-    code.html_safe
+    html_code = construct_review_response html_code, self_id, show_tags, current_user
+    html_code.html_safe
   end
 
   # Computes the total score awarded for a review
@@ -236,10 +236,10 @@ class Response < ActiveRecord::Base
   # Function which creates the html for responses to a questionnaire by a particular user
   # code - The html to be returned
   # self_id - Review id
-  # show_tags - Boolean which tells us if tags are enabled or disabled
+  # show_tags - Boolean that tells whether or not tags are being viewed now
   # current_user - User id
-  def construct_review_response code, self_id, show_tags = nil, current_user = nil
-    code += '<table id="review_' + self_id + '" class="table table-bordered">'
+  def construct_review_response html_code, self_id, show_tags = nil, current_user = nil
+    html_code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
@@ -250,25 +250,24 @@ class Response < ActiveRecord::Base
       # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                        answer_id_2 => [tag_prompt_id_3], ...}
       tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
-      code = add_rows_for_each_question questions, answers, code, tag_prompt_deployments, tagged_answer_prompts, current_user
+      html_code = add_rows_for_each_question questions, answers, html_code, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
               end
-    code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
-    code += '</table>'
+    html_code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
+    html_code += '</table>'
   end
 
   # Function which adds a table row for each question-answer pair
-  # questionnaire_max - Maximum score for a question
   # questions - Questions in the questionnaire
   # answers - Answers to the questions
   # code - Html to be returned
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
-  def add_rows_for_each_question questions, answers, code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
+  def add_rows_for_each_question questions, answers, html_code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
     seq_no = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
@@ -276,9 +275,9 @@ class Response < ActiveRecord::Base
       answer = answers.find {|a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
-      code += '<tr class="' + row_class + '"><td>'
+      html_code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
-        code += if question.instance_of? Criterion
+        html_code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
                 elsif question.instance_of? Scale
@@ -287,8 +286,8 @@ class Response < ActiveRecord::Base
                   question.view_completed_question(seq_no, answer) || ''
                 end
       end
-      code += '</td></tr>'
+      html_code += '</td></tr>'
     end
-    code
+    html_code
   end
 end

@@ -1,6 +1,7 @@
 class MetricsQuery
-  # Setting the Tagging Threshold Constant
-  TAG_CERTAINTY_THRESHOLD = 0.8
+#The certainty threshold is the fraction (between 0 and 1) that says how certain the ML algorithm
+# must be of a tag value before it will ask the author to tag it manually.
+TAG_CERTAINTY_THRESHOLD = 0.8
 
   # answer_tagging: this method calls the WS to determine which tags need to be rendered
   # for manual inputs in order to increase the bot's confidence on its next judgment.

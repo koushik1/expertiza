@@ -169,19 +169,19 @@ class Criterion < ScoredQuestion
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
-  # count - The question number
+  # seq_no - The question number
   # answer - The answer associated with the question
-  # questionnaire_max - Maximum score for a question
+  # max_question_score - Maximum score for a question
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   # current_user - The user
   def view_completed_question(seq_no, answer, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil)
-    max_score = Response.new.questionnaire_by_answer(answer).max_question_score
-    html = '<b>' + seq_no.to_s + ". " + self.txt + ' [Max points: ' + max_score.to_s + "]</b>"
+    max_question_score = Response.new.questionnaire_by_answer(answer).max_question_score
+    html = '<b>' + seq_no.to_s + ". " + self.txt + ' [Max points: ' + max_question_score.to_s + "]</b>"
 
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = if score != "-"
-                      answer.answer * 1.0 / max_score
+                      answer.answer * 1.0 / max_question_score
                     else
                       0
                     end
