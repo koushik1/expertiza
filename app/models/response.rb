@@ -249,7 +249,10 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                        answer_id_2 => [tag_prompt_id_3], ...}
-      tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
+      unless tag_prompt_deployments.nil?
+        tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
+      end
+
       html_code = add_rows_for_each_question questions, answers, html_code, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?

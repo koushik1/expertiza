@@ -20,10 +20,11 @@ TAG_CERTAINTY_THRESHOLD = 0.8
 
     # this is rather hard-coded, need to find a way to link each tag_prompt with its
     # corresponding web service call
-    # we create a dict which maps tag prompt ids to their relevant API endpoints
-    metrics = { 1 => 'problems', 2 => 'suggestions', 3 => 'emotions', 5 => 'sentiments'}
+    # we create a dict which maps tag prompts to their relevant API endpoints
+    metrics = { 'prompt_1' => 'problems', 'prompt_2' => 'suggestions', 'prompt_3' => 'emotions', 'prompt_5' => 'sentiments'}
     tag_prompt_deployments.each do |tag_dep|
-      metric = metrics[tag_dep.tag_prompt_id]
+      promt_text = TagPrompt.find(tag_dep.tag_prompt_id).prompt
+      metric = metrics[promt_text]
 
       # step 2. pass ws_input to web service and use the response to construct a hash
       # which maps answer_id to tag_prompt_id
