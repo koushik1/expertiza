@@ -176,15 +176,9 @@ class Criterion < ScoredQuestion
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
   # current_user - The user
   def view_answered_question(seq_no, answer, tag_prompt_deployments = nil, tagged_answer_prompts = nil, user_id = nil)
-    max_question_score = self.questionnaire.max_question_score
-    html = '<b>' + seq_no.to_s + ". " + self.txt + ' [Max points: ' + max_question_score.to_s + "]</b>"
-
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
-    score_percent = if score != "-"
-                      answer.answer * 1.0 / max_question_score
-                    else
-                      0
-                    end
+    max_question_score = self.questionnaire.max_question_score
+    score_percent = score != "-" ? answer.answer * 1.0 / max_question_score : 0
 
     score_color = if score_percent > 0.8
                     "c5"
@@ -198,13 +192,12 @@ class Criterion < ScoredQuestion
                     "c1"
                   end
 
-    html += '<table cellpadding="5">'
-    html += '<tr>'
+    html = '<b>' + seq_no.to_s + ". " + self.txt + ' [Max points: ' + max_question_score.to_s + "]</b>"
+    html += '<table cellpadding="5"><tr>'
     html += '<td>'
-    html += '<div class="' + score_color + '" style="width:30px; height:30px;' \
-      ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
-    html += score
-    html += '</div>'
+    html += '<div class="' + score_color + '" style="width:30px; height:30px;' +
+      ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">' +
+      score + '</div>'
     html += '</td>'
     if answer && !answer.comments.nil?
       html += '<td style="padding-left:10px">'

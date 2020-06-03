@@ -15,7 +15,7 @@ class Response < ActiveRecord::Base
     id
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
+  def display_as_html(prefix = nil, seq_no = nil, _file_url = nil, show_tags = nil, user_id = nil)
     html_code = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -24,12 +24,12 @@ class Response < ActiveRecord::Base
     html_code += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
     if prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + self.id.to_s
-      html_code += construct_instructor_html self_id, count
+      html_code += construct_instructor_html self_id, seq_no
     else # in student end
       self_id = self.id.to_s
-      html_code += construct_student_html self_id, count
+      html_code += construct_student_html self_id, seq_no
     end
-    html_code += construct_review_response self_id, show_tags, current_user
+    html_code += construct_review_response self_id, show_tags, user_id
     html_code.html_safe
   end
 
@@ -215,17 +215,17 @@ class Response < ActiveRecord::Base
 
   private
 
-  def construct_instructor_html self_id, count
-    html_code = '<h4><B>Review ' + count.to_s + '</B></h4>'
+  def construct_instructor_html self_id, seq_no
+    html_code = '<h4><B>Review ' + seq_no.to_s + '</B></h4>'
     html_code += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
     html_code += '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
-  def construct_student_html self_id, count
+  def construct_student_html self_id, seq_no
     html_code = '<table width="100%">'\
 						 '<tr>'\
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
+						 '<td align="left" width="70%"><b>Review ' + seq_no.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
 						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
 						 '</td>'\
 						 '<td align="left"><b>Last Reviewed:</b>'\
@@ -249,9 +249,9 @@ class Response < ActiveRecord::Base
       # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                        answer_id_2 => [tag_prompt_id_3], ...}
       tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments) unless tag_prompt_deployments.nil?
-
       html_code += add_rows_for_each_question questions, answers, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
+    
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else

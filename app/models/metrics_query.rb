@@ -1,7 +1,7 @@
 class MetricsQuery
-#The certainty threshold is the fraction (between 0 and 1) that says how certain the ML algorithm
-# must be of a tag value before it will ask the author to tag it manually.
-TAG_CERTAINTY_THRESHOLD = 0.8
+  # The certainty threshold is the fraction (between 0 and 1) that says how certain the ML algorithm
+  # must be of a tag value before it will ask the author to tag it manually.
+  TAG_CERTAINTY_THRESHOLD = 0.8
 
   # answer_tagging: this method calls the WS to determine which tags need to be rendered
   # for manual inputs in order to increase the bot's confidence on its next judgment.
@@ -23,8 +23,8 @@ TAG_CERTAINTY_THRESHOLD = 0.8
     # we create a dict which maps tag prompts to their relevant API endpoints
     metrics = { 'Mention Problems?' => 'problems', 'Suggest Solutions?' => 'suggestions', 'Mention Praise?' => 'emotions', 'Positive Tone?' => 'sentiments'}
     tag_prompt_deployments.each do |tag_dep|
-      promt_text = TagPrompt.find(tag_dep.tag_prompt_id).prompt
-      metric = metrics[promt_text]
+      prompt_text = TagPrompt.find(tag_dep.tag_prompt_id).prompt
+      metric = metrics[prompt_text]
 
       # step 2. pass ws_input to web service and use the response to construct a hash
       # which maps answer_id to tag_prompt_id
