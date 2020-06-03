@@ -234,11 +234,10 @@ class Response < ActiveRecord::Base
   end
 
   # Function which creates the html for responses to a questionnaire by a particular user
-  # code - The html to be returned
-  # self_id - Review id
+  # self_id - This Response object's id
   # show_tags - Boolean that tells whether or not tags are being viewed now
-  # current_user - User id
-  def construct_review_response self_id, show_tags = nil, current_user = nil
+  # user_id - Used to find answers that belong to this user. If this is nil, find answers from every reviewer of the question.
+  def construct_review_response self_id, show_tags = nil, user_id = nil
     html_code = '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
@@ -249,7 +248,7 @@ class Response < ActiveRecord::Base
       # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                        answer_id_2 => [tag_prompt_id_3], ...}
       tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments) unless tag_prompt_deployments.nil?
-      html_code += add_rows_for_each_question questions, answers, tag_prompt_deployments, tagged_answer_prompts, current_user
+      html_code += add_rows_for_each_question questions, answers, tag_prompt_deployments, tagged_answer_prompts, user_id
     end
     
     comment = if !self.additional_comment.nil?
@@ -264,10 +263,10 @@ class Response < ActiveRecord::Base
   # Function which adds a table row for each question-answer pair
   # questions - Questions in the questionnaire
   # answers - Answers to the questions
-  # code - Html to be returned
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
-  def add_rows_for_each_question questions, answers, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
+  # user_id - Used to find answers that belong to this user. If this is nil, find answers from every reviewer of the question.
+  def add_rows_for_each_question questions, answers, tag_prompt_deployments = nil, tagged_answer_prompts = nil, user_id = nil
     seq_no = 0
     html_code = ''
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
@@ -280,7 +279,7 @@ class Response < ActiveRecord::Base
       if !answer.nil? or question.is_a? QuestionnaireHeader
         html_code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_answered_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
+                  question.view_answered_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, user_id) || ''
                 else
                   question.view_answered_question(seq_no, answer) || ''
                 end

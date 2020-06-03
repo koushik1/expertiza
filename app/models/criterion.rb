@@ -171,10 +171,9 @@ class Criterion < ScoredQuestion
   # This method returns what to display if a student is viewing a filled-out questionnaire
   # seq_no - The question number
   # answer - The answer associated with the question
-  # max_question_score - Maximum score for a question
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
-  # current_user - The user
+  # user_id - Used to find answers that belong to this user. If this is nil, find answers from every reviewer of the question.
   def view_answered_question(seq_no, answer, tag_prompt_deployments = nil, tagged_answer_prompts = nil, user_id = nil)
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
     max_question_score = self.questionnaire.max_question_score
