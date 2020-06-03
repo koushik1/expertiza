@@ -4,20 +4,20 @@ class TagPrompt < ActiveRecord::Base
   validates :control_type, presence: true
 
   # structure of tagged_prompts = [tag_prompt_id_1, tag_prompt_id_2, ...]
-  def self.show_tag_prompts(tag_prompt_deployments, tagged_prompts, answer, current_user = nil)
+  def self.show_tag_prompts(tag_prompt_deployments, tagged_prompts, answer, user_id = nil)
     html = ''
     #### start code to show tag prompts ####
     unless tag_prompt_deployments.blank?
       question = Question.find(answer.question_id)
-        html += '<tr><td colspan="2">'
-        tag_prompt_deployments.each do |tag_dep|
-          if tagged_prompts.excludes?(tag_dep.tag_prompt_id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-            tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-            html += tag_prompt.html_control(tag_dep, answer, current_user)
-          end
+      html += '<tr><td colspan="2">'
+      tag_prompt_deployments.each do |tag_dep|
+        if tagged_prompts.excludes?(tag_dep.tag_prompt_id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
+          tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
+          html += tag_prompt.html_control(tag_dep, answer, user_id)
         end
-        html += '</td></tr>'
       end
+      html += '</td></tr>'
+    end
     #### end code to show tag prompts ####
     html
   end

@@ -16,18 +16,18 @@ class Response < ActiveRecord::Base
   end
 
   def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
-    identifier = ""
+    html_code = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
     # a ReviewResponseMap.
-    identifier += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
+    html_code += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
     if prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + self.id.to_s
-      html_code = construct_instructor_html identifier, self_id, count
+      html_code += construct_instructor_html self_id, count
     else # in student end
       self_id = self.id.to_s
-      html_code = construct_student_html identifier, self_id, count
+      html_code += construct_student_html self_id, count
     end
     html_code += construct_review_response self_id, show_tags, current_user
     html_code.html_safe
@@ -215,15 +215,15 @@ class Response < ActiveRecord::Base
 
   private
 
-  def construct_instructor_html identifier, self_id, count
-    identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
-    identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-    identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
+  def construct_instructor_html self_id, count
+    html_code = '<h4><B>Review ' + count.to_s + '</B></h4>'
+    html_code += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
+    html_code += '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
-  def construct_student_html identifier, self_id, count
-    identifier += '<table width="100%">'\
+  def construct_student_html self_id, count
+    html_code = '<table width="100%">'\
 						 '<tr>'\
 						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
 						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
@@ -243,15 +243,12 @@ class Response < ActiveRecord::Base
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
-      #questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       # structure of tagged_answer_prompts = { answer_id_1 => [tag_prompt_id_1, tag_prompt_id_2],
       #                                        answer_id_2 => [tag_prompt_id_3], ...}
-      unless tag_prompt_deployments.nil?
-        tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
-      end
+      tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments) unless tag_prompt_deployments.nil?
 
       html_code += add_rows_for_each_question questions, answers, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
@@ -277,7 +274,7 @@ class Response < ActiveRecord::Base
     questions.each do |question|
       seq_no += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find {|a| a.question_id == question.id }
-      row_class = count.even? ? "info" : "warning"
+      row_class = seq_no.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       html_code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
