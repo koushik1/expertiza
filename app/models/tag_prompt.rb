@@ -7,10 +7,8 @@ class TagPrompt < ActiveRecord::Base
   def self.show_tag_prompts(tag_prompt_deployments, tagged_prompts, answer, current_user = nil)
     html = ''
     #### start code to show tag prompts ####
-    unless tag_prompt_deployments.nil?
-      resp = Response.find(answer.response_id)
+    unless tag_prompt_deployments.blank?
       question = Question.find(answer.question_id)
-      if tag_prompt_deployments.count > 0
         html += '<tr><td colspan="2">'
         tag_prompt_deployments.each do |tag_dep|
           if tagged_prompts.excludes?(tag_dep.tag_prompt_id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
@@ -20,7 +18,6 @@ class TagPrompt < ActiveRecord::Base
         end
         html += '</td></tr>'
       end
-    end
     #### end code to show tag prompts ####
     html
   end

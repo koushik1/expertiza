@@ -29,7 +29,7 @@ class Response < ActiveRecord::Base
       self_id = self.id.to_s
       html_code = construct_student_html identifier, self_id, count
     end
-    html_code = construct_review_response html_code, self_id, show_tags, current_user
+    html_code += construct_review_response self_id, show_tags, current_user
     html_code.html_safe
   end
 
@@ -238,8 +238,8 @@ class Response < ActiveRecord::Base
   # self_id - Review id
   # show_tags - Boolean that tells whether or not tags are being viewed now
   # current_user - User id
-  def construct_review_response html_code, self_id, show_tags = nil, current_user = nil
-    html_code += '<table id="review_' + self_id + '" class="table table-bordered">'
+  def construct_review_response self_id, show_tags = nil, current_user = nil
+    html_code = '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
@@ -253,7 +253,7 @@ class Response < ActiveRecord::Base
         tagged_answer_prompts = MetricsQuery.new.get_tagged_answer_prompts(answers, tag_prompt_deployments)
       end
 
-      html_code = add_rows_for_each_question questions, answers, html_code, tag_prompt_deployments, tagged_answer_prompts, current_user
+      html_code += add_rows_for_each_question questions, answers, tag_prompt_deployments, tagged_answer_prompts, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -270,8 +270,9 @@ class Response < ActiveRecord::Base
   # code - Html to be returned
   # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
   # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
-  def add_rows_for_each_question questions, answers, html_code, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
+  def add_rows_for_each_question questions, answers, tag_prompt_deployments = nil, tagged_answer_prompts = nil, current_user = nil
     seq_no = 0
+    html_code = ''
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
       seq_no += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
@@ -283,8 +284,6 @@ class Response < ActiveRecord::Base
         html_code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_answered_question(seq_no, answer, tag_prompt_deployments, tagged_answer_prompts, current_user) || ''
-                elsif question.instance_of? Scale
-                  question.view_answered_question(seq_no, answer) || ''
                 else
                   question.view_answered_question(seq_no, answer) || ''
                 end
