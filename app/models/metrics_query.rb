@@ -21,14 +21,16 @@ class MetricsQuery
     # this is rather hard-coded, need to find a way to link each tag_prompt with its
     # corresponding web service call
     # we create a dict which maps tag prompts to their relevant API endpoints
-    metrics = { 'Mention Problems?' => 'problems', 'Suggest Solutions?' => 'suggestions', 'Mention Praise?' => 'emotions', 'Positive Tone?' => 'sentiments'}
+    urls = { 'Mention Problems?' => WEBSERVICE_CONFIG['problem_webservice_url'],
+             'Suggest Solutions?' => WEBSERVICE_CONFIG['suggestions_webservice_url'],
+             'Mention Praise?' => WEBSERVICE_CONFIG['emotions_webservice_url'],
+             'Positive Tone?' => WEBSERVICE_CONFIG['sentiment_webservice_url']}
     tag_prompt_deployments.each do |tag_dep|
       prompt_text = TagPrompt.find(tag_dep.tag_prompt_id).prompt
-      metric = metrics[prompt_text]
+      url = urls[prompt_text]
 
       # step 2. pass ws_input to web service and use the response to construct a hash
       # which maps answer_id to tag_prompt_id
-      url = WEBSERVICE_CONFIG['metareview_webservice_url'] + metric
       begin
         response = RestClient.post url, ws_input.to_json, content_type: :json, accept: :json
         ws_output = JSON.parse(response)["reviews"]

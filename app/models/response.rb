@@ -263,8 +263,8 @@ class Response < ActiveRecord::Base
   # Function which adds a table row for each question-answer pair
   # questions - Questions in the questionnaire
   # answers - Answers to the questions
-  # tag_prompt_deployments - Template tag prompts assigned to this questionnaire
-  # tagged_answer_prompts - The hash that maps each answer's id to its tag_prompts that the bot is already confident of
+  # tag_prompt_deployments - Tag prompts assigned to this questionnaire
+  # tagged_answer_prompts - A hash containing tag_prompts that the web service is confident of, so they don’t need to be presented to the user
   # user_id - Used to find answers that belong to this user. If this is nil, find answers from every reviewer of the question.
   def add_rows_for_each_question questions, answers, tag_prompt_deployments = nil, tagged_answer_prompts = nil, user_id = nil
     seq_no = 0
